@@ -20,22 +20,22 @@ const char *get_os_type(void) {
 	return os_type;
 }
 
-const char *get_os_release(void) {
-	OSVERSIONINFO osvi;
-	char *s = malloc(LEN);
+// const char *get_os_release(void) {
+// 	OSVERSIONINFO osvi;
+// 	char *s = malloc(LEN);
 
-	ZeroMemory(&osvi, sizeof(osvi));
-	osvi.dwOSVersionInfoSize = sizeof(osvi);
+// 	ZeroMemory(&osvi, sizeof(osvi));
+// 	osvi.dwOSVersionInfoSize = sizeof(osvi);
 
-	if (GetVersionEx(&osvi))
-		snprintf(s, LEN, "%ld.%ld.%ld",
-			 osvi.dwMajorVersion, osvi.dwMinorVersion, osvi.dwBuildNumber);
-	else
-		strncpy(s, "unknown", LEN);
-	s[LEN - 1] = '\0';
+// 	if (GetVersionEx(&osvi))
+// 		snprintf(s, LEN, "%ld.%ld.%ld",
+// 			 osvi.dwMajorVersion, osvi.dwMinorVersion, osvi.dwBuildNumber);
+// 	else
+// 		strncpy(s, "unknown", LEN);
+// 	s[LEN - 1] = '\0';
 
-	return s;
-}
+// 	return s;
+// }
 
 unsigned int get_cpu_num(void) {
 	unsigned int num;

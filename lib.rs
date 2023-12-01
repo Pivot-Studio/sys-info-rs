@@ -353,8 +353,8 @@ impl From<Box<dyn std::error::Error>> for Error {
 extern "C" {
     #[cfg(any(target_vendor = "apple", target_os = "windows"))]
     fn get_os_type() -> *const i8;
-    #[cfg(any(target_vendor = "apple", target_os = "windows", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd"))]
-    fn get_os_release() -> *const i8;
+    // #[cfg(any(target_vendor = "apple", target_os = "windows", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd"))]
+    // fn get_os_release() -> *const i8;
 
     #[cfg(all(not(any(target_os = "solaris", target_os = "illumos", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd")), any(unix, windows)))]
     fn get_cpu_num() -> u32;
@@ -424,50 +424,50 @@ pub fn os_type() -> Result<String, Error> {
     }
 }
 
-/// Get operation system release version.
-///
-/// Such as "3.19.0-gentoo"
-pub fn os_release() -> Result<String, Error> {
-    #[cfg(target_os = "linux")]
-    {
-        let mut s = String::new();
-        File::open("/proc/sys/kernel/osrelease")?.read_to_string(&mut s)?;
-        s.pop(); // pop '\n'
-        Ok(s)
-    }
-    #[cfg(any(target_vendor = "apple", target_os = "windows", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd"))]
-    {
-        unsafe {
-	    let rp = get_os_release() as *const c_char;
-	    if rp == std::ptr::null() {
-		Err(Error::Unknown)
-	    } else {
-		let typ = ffi::CStr::from_ptr(rp).to_bytes();
-		Ok(String::from_utf8_lossy(typ).into_owned())
-	    }
-	}
-    }
-    #[cfg(any(target_os = "solaris", target_os = "illumos", target_os = "haiku"))]
-    {
-        let release: Option<String> = unsafe {
-            let mut name: libc::utsname = std::mem::zeroed();
-            if libc::uname(&mut name) < 0 {
-                None
-            } else {
-                let cstr = std::ffi::CStr::from_ptr(name.release.as_mut_ptr());
-                Some(cstr.to_string_lossy().to_string())
-            }
-        };
-        match release {
-            None => Err(Error::Unknown),
-            Some(release) => Ok(release),
-        }
-    }
-    #[cfg(not(any(target_os = "linux", target_vendor = "apple", target_os = "windows", target_os = "solaris", target_os = "illumos", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd", target_os = "haiku")))]
-    {
-        Err(Error::UnsupportedSystem)
-    }
-}
+// /// Get operation system release version.
+// ///
+// /// Such as "3.19.0-gentoo"
+// pub fn os_release() -> Result<String, Error> {
+//     #[cfg(target_os = "linux")]
+//     {
+//         let mut s = String::new();
+//         File::open("/proc/sys/kernel/osrelease")?.read_to_string(&mut s)?;
+//         s.pop(); // pop '\n'
+//         Ok(s)
+//     }
+//     #[cfg(any(target_vendor = "apple", target_os = "windows", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd"))]
+//     {
+//         unsafe {
+// 	    let rp = get_os_release() as *const c_char;
+// 	    if rp == std::ptr::null() {
+// 		Err(Error::Unknown)
+// 	    } else {
+// 		let typ = ffi::CStr::from_ptr(rp).to_bytes();
+// 		Ok(String::from_utf8_lossy(typ).into_owned())
+// 	    }
+// 	}
+//     }
+//     #[cfg(any(target_os = "solaris", target_os = "illumos", target_os = "haiku"))]
+//     {
+//         let release: Option<String> = unsafe {
+//             let mut name: libc::utsname = std::mem::zeroed();
+//             if libc::uname(&mut name) < 0 {
+//                 None
+//             } else {
+//                 let cstr = std::ffi::CStr::from_ptr(name.release.as_mut_ptr());
+//                 Some(cstr.to_string_lossy().to_string())
+//             }
+//         };
+//         match release {
+//             None => Err(Error::Unknown),
+//             Some(release) => Ok(release),
+//         }
+//     }
+//     #[cfg(not(any(target_os = "linux", target_vendor = "apple", target_os = "windows", target_os = "solaris", target_os = "illumos", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd", target_os = "haiku")))]
+//     {
+//         Err(Error::UnsupportedSystem)
+//     }
+// }
 
 /// Get the os release note of Linux
 ///
@@ -887,12 +887,12 @@ mod test {
         println!("os_type(): {}", typ);
     }
 
-    #[test]
-    pub fn test_os_release() {
-        let release = os_release().unwrap();
-        assert!(release.len() > 0);
-        println!("os_release(): {}", release);
-    }
+    // #[test]
+    // pub fn test_os_release() {
+    //     let release = os_release().unwrap();
+    //     assert!(release.len() > 0);
+    //     println!("os_release(): {}", release);
+    // }
 
     #[test]
     pub fn test_cpu_num() {
